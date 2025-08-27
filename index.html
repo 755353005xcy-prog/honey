@@ -7,7 +7,11 @@
     body {
       margin: 0;
       height: 100vh;
-      background: linear-gradient(to right, pink, lightyellow);
+      background: radial-gradient(circle at 20% 30%, rgba(255,192,203,0.6), transparent 60%),
+                  radial-gradient(circle at 80% 70%, rgba(173,216,230,0.6), transparent 60%),
+                  linear-gradient(120deg, #ffb6c1, #dda0dd, #9370db, #4169e1);
+      background-size: 300% 300%;
+      animation: galaxyMove 20s infinite alternate;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -15,20 +19,31 @@
       font-family: "微软雅黑", sans-serif;
       overflow: hidden;
       position: relative;
+      color: #fff;
+      text-align: center;
+    }
+
+    @keyframes galaxyMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 50% 100%; }
+      100% { background-position: 100% 50%; }
     }
 
     h1 {
       font-size: 48px;
-      color: crimson;
+      color: #ff3366;
       margin: 10px;
-      animation: fadein 2s ease-in-out, blink 1s infinite;
+      animation: fadein 2s ease-in-out, glow 2s infinite alternate;
+      text-shadow: 0 0 10px #ff99cc, 0 0 20px #ff66cc, 0 0 30px #ff3399;
     }
 
-    p {
-      font-size: 20px;
-      color: #444;
+    p#romantic-text {
+      font-size: 22px;
+      color: #fff;
       margin-top: 5px;
+      cursor: pointer;
       animation: fadein 3s ease-in-out;
+      text-shadow: 0 0 8px #ffb6c1;
     }
 
     @keyframes fadein {
@@ -36,17 +51,18 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes blink {
-      0%, 100% { color: crimson; }
-      50% { color: deeppink; }
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #ff99cc; }
+      to { text-shadow: 0 0 25px #ff66ff, 0 0 40px #ff3399; }
     }
 
+    /* 爱心 */
     .heart {
       position: absolute;
       font-size: 20px;
       animation: floatUp 4s linear forwards;
+      pointer-events: none;
     }
-
     @keyframes floatUp {
       0% { transform: translateY(0) scale(1); opacity: 1; }
       100% { transform: translateY(-600px) scale(1.5); opacity: 0; }
@@ -58,43 +74,148 @@
       opacity: 0.7;
       animation: floatHeart linear infinite;
     }
-
     @keyframes floatHeart {
       0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
       10% { opacity: 1; }
       100% { transform: translateY(-50px) translateX(50px) rotate(360deg); opacity: 0; }
     }
 
-    .star {
+    /* 银河小星星 */
+    .bg-star {
       position: absolute;
-      font-size: 12px;
-      color: gold;
+      color: white;
+      opacity: 0.8;
+      font-size: 8px;
       animation: twinkle 2s infinite alternate;
+      pointer-events: none;
     }
-
     @keyframes twinkle {
       from { opacity: 0.3; }
       to { opacity: 1; }
+    }
+
+    /* 心动计数器 */
+    #counter {
+      margin-top: 15px;
+      font-size: 20px;
+      background: rgba(255,255,255,0.2);
+      padding: 5px 15px;
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+    }
+
+    /* 音乐图标 */
+    #music-icon {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 28px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .spinning {
+      animation: spin 3s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* 留言框 */
+    #message-box {
+      margin-top: 20px;
+    }
+    textarea {
+      width: 280px;
+      height: 80px;
+      border-radius: 10px;
+      border: none;
+      padding: 10px;
+      font-size: 16px;
+      resize: none;
+    }
+    button {
+      margin-top: 10px;
+      padding: 6px 15px;
+      border: none;
+      border-radius: 15px;
+      background: #ff66a3;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #ff3385;
+    }
+    #display-message {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #ffe6f0;
     }
   </style>
 </head>
 <body>
   <h1>❤️ 亲爱的，七夕快乐 ❤️</h1>
-  <p>遇见你，是我最浪漫的奇迹~</p>
+  <p id="romantic-text">感谢你打破我缄默不言的夏 (点击切换下一句~)</p>
+
+  <!-- 心动计数器 -->
+  <div id="counter">心动值：0 💗</div>
+
+  <!-- 音乐播放器 -->
+  <audio id="bg-music" loop>
+    <source src="music.mp3" type="audio/mpeg">
+    您的浏览器不支持音频播放。
+  </audio>
+  <div id="music-icon">🎵</div>
+
+  <!-- 留言框 -->
+  <div id="message-box">
+    <textarea id="love-message" placeholder="写下你想对我说的话吧~"></textarea><br>
+    <button onclick="submitMessage()">发送留言</button>
+    <div id="display-message"></div>
+  </div>
 
   <script>
-    // 点击出现小爱心
-    document.addEventListener("click", function(e) {
-      const heart = document.createElement("div");
-      heart.className = "heart";
-      heart.style.left = e.clientX + "px";
-      heart.style.top = e.clientY + "px";
-      heart.innerText = "💖";
-      document.body.appendChild(heart);
-      setTimeout(() => heart.remove(), 4000);
+    let counter = 0;
+    let sentences = [
+      "感谢你打破我缄默不言的夏",
+      "和你在一起的日子，每一天都像节日",
+      "银河纵使万千光芒，我眼里却只有你",
+      "愿此刻星河，映照你笑颜"
+    ];
+    let index = 0;
+
+    // 点击文字切换句子
+    document.getElementById("romantic-text").addEventListener("click", function() {
+      index = (index + 1) % sentences.length;
+      this.textContent = sentences[index];
     });
 
-    // 自动生成漂浮小爱心
+    // 点击出现小爱心 + 计数器
+    document.addEventListener("click", function(e) {
+      if (e.target.id !== "music-icon" && e.target.tagName !== "TEXTAREA" && e.target.tagName !== "BUTTON") {
+        const heart = document.createElement("div");
+        heart.className = "heart";
+        heart.style.left = e.clientX + "px";
+        heart.style.top = e.clientY + "px";
+        heart.innerText = "💖";
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 4000);
+
+        counter++;
+        document.getElementById("counter").innerText = "心动值：" + counter + " 💗";
+
+        // 点击时触发音乐播放
+        const music = document.getElementById("bg-music");
+        if (music.paused) {
+          music.play();
+          document.getElementById("music-icon").classList.add("spinning");
+        }
+      }
+    });
+
+    // 自动漂浮爱心
     function createFloatingHeart() {
       const heart = document.createElement("div");
       heart.className = "floating-heart";
@@ -106,18 +227,39 @@
     }
     setInterval(createFloatingHeart, 500);
 
-    // 随机飘落小星星
-    function createStar() {
+    // 银河闪烁星星
+    function createBgStar() {
       const star = document.createElement("div");
-      star.className = "star";
-      star.innerText = "⭐";
+      star.className = "bg-star";
+      star.innerText = "✦";
       star.style.left = Math.random() * window.innerWidth + "px";
       star.style.top = Math.random() * window.innerHeight + "px";
-      star.style.fontSize = 8 + Math.random() * 12 + "px";
+      star.style.fontSize = (Math.random() * 6 + 6) + "px";
       document.body.appendChild(star);
       setTimeout(() => star.remove(), 5000);
     }
-    setInterval(createStar, 800);
+    setInterval(createBgStar, 200);
+
+    // 音乐图标点击控制
+    document.getElementById("music-icon").addEventListener("click", function() {
+      const music = document.getElementById("bg-music");
+      if (music.paused) {
+        music.play();
+        this.classList.add("spinning");
+      } else {
+        music.pause();
+        this.classList.remove("spinning");
+      }
+    });
+
+    // 留言提交
+    function submitMessage() {
+      const msg = document.getElementById("love-message").value.trim();
+      if (msg) {
+        document.getElementById("display-message").innerText = "❤️ 你的留言：" + msg;
+        document.getElementById("love-message").value = "";
+      }
+    }
   </script>
 </body>
 </html>
